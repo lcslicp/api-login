@@ -15,5 +15,16 @@
   "bugs": {
     "url": "https://github.com/lcslicp/api-login/issues"
   },
-  "homepage": "https://github.com/lcslicp/api-login#readme"
+  "homepage": "https://github.com/lcslicp/api-login#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.25.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }
