@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
-const Jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken'); 
+const dotenv = require('dotenv');
 
 const models = require('../models');
 
-
+dotenv.config();
 const signUp = async (req, res) => {
 
     const { firstName,
@@ -44,9 +45,38 @@ const signUp = async (req, res) => {
     
 };
 
+const logIn = async (req, res) => {
 
+    const { username, password } = req.body;
+    if(!username || !password) return res.status(400).json({
+        message: 'All fields are required.'
+    });
+
+    const foundUser = await models.User.findOne({where: { username: username}});
+    if(!foundUser) return res.status(401).json({
+        message: 'Invalid credentials.'
+    });
+
+    const matchPass = await bcrypt.compare(password, foundUser.password);
+    if(matchPass){
+        const token = jwt.sign({
+            username: foundUser.username,
+            userId: foundUser.id
+        }, '' + process.env.ACCESS_TOKEN_SECRET
+        )
+
+        res.status(200).json({
+            message: 'Login successful!',
+            token: token
+        })
+    }
+    res.status(401).json({
+        message: 'Invalid credentials.'
+    })
+}
 
 
 module.exports = {
-    signUp: signUp
+    signUp: signUp,
+    logIn: logIn
 };
