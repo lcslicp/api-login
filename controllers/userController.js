@@ -109,9 +109,25 @@ const updateUser = async (req, res) => {
     });
 }
 
+const deleteUser = async (req, res) => {
+    const id = req.params.id;
+
+    const userDeleted = await models.User.destroy({
+        where: {id: id}
+    });
+
+    if(userDeleted) return res.status(204).json({
+        message: 'Account deleted successfully!'
+    })
+    res.status(400).json({
+        message: 'Failed to delete account.'
+    });
+}
+
 
 module.exports = {
     signUp: signUp,
     logIn: logIn,
-    updateUser: updateUser
+    updateUser: updateUser,
+    deleteUser: deleteUser
 };
