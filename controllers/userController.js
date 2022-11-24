@@ -75,8 +75,43 @@ const logIn = async (req, res) => {
     })
 }
 
+const updateUser = async (req, res) => {
+    const id = req.params.id;
+
+    const { firstName,
+        lastName,
+        address,
+        postCode,
+        contactNumber,
+        email,
+        username,
+        password } = req.body;
+
+    const userUpdated = await models.User.update({
+        firstName,
+        lastName,
+        address,
+        postCode,
+        contactNumber,
+        email,
+        username,
+        password
+    }, 
+    {
+        where: {id: id},
+    });
+
+    if(userUpdated) return res.status(200).json({
+        message: 'User updated successfully!'
+    })
+    res.status(400).json({
+        message: 'Failed to update user, please try again.'
+    });
+}
+
 
 module.exports = {
     signUp: signUp,
-    logIn: logIn
+    logIn: logIn,
+    updateUser: updateUser
 };
