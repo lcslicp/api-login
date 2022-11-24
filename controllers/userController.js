@@ -34,12 +34,12 @@ const signUp = async (req, res) => {
         password: hashedPassword
     });
 
-    if (user) {
-        res.status(201).json({
+    if (user && !duplicate) {
+        return res.status(201).json({
             message: 'Account created successfully!'
         });
     }
-    res.status(500).json({
+    return res.status(500).json({
         message: 'Failed to create account. Please try again.'
     });
     
@@ -52,7 +52,7 @@ const logIn = async (req, res) => {
         message: 'All fields are required.'
     });
 
-    const foundUser = await models.User.findOne({where: { username: username}});
+    const foundUser = await models.User.findOne({where: { username: username }});
     if(!foundUser) return res.status(401).json({
         message: 'Invalid credentials.'
     });
@@ -68,11 +68,11 @@ const logIn = async (req, res) => {
         res.status(200).json({
             message: 'Login successful!',
             token: token
-        })
+        });
     }
     res.status(401).json({
         message: 'Invalid credentials.'
-    })
+    });
 }
 
 const updateUser = async (req, res) => {
@@ -98,7 +98,7 @@ const updateUser = async (req, res) => {
         password
     }, 
     {
-        where: {id: id},
+        where: { id: id },
     });
 
     if(userUpdated) return res.status(200).json({
@@ -113,7 +113,7 @@ const deleteUser = async (req, res) => {
     const id = req.params.id;
 
     const userDeleted = await models.User.destroy({
-        where: {id: id}
+        where: { id: id }
     });
 
     if(userDeleted) return res.status(204).json({
@@ -124,10 +124,55 @@ const deleteUser = async (req, res) => {
     });
 }
 
+const getAllUsers = async (req, res) => {
+    
+    await models.User.findAll().then(result => {
+        res.status(200).json(result);
+    }).catch(error => {
+        res.status(500).json({
+            message: 'Something went wrong.'
+        })
+    });
+};
+
+const deleteAllUsers = async (req, res) => {
+
+    const usersDeleted = await models.User.destroy({
+        where: {}
+    });
+
+    if(usersDeleted) return res.status(204).json({
+        message: 'All accounts deleted successfully!'
+    })
+    res.status(400).json({
+        message: 'Something went wrong.'
+    });
+}
+
+// When removing multiply users with specific attributes
+// In this samplecase, users with NYC address
+const removeNYCUsers = async (req, res) => {
+
+    const usersInNYC = await models.User.findAll({
+        where: { address: 'NYC' },
+    });
+
+    if(usersInNYC){ 
+        await usersInNYC.destroy();
+        }
+    return res.status(400).json({
+        message: 'Something went wrong.'
+    });
+}
+
 
 module.exports = {
     signUp: signUp,
     logIn: logIn,
     updateUser: updateUser,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    getAllUsers: getAllUsers,
+    getAllUsers: getAllUsers,
+    deleteAllUsers: deleteAllUsers,
+    removeNYCUsers, removeNYCUsers
 };
